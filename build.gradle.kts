@@ -33,3 +33,10 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "1.8"
 	}
 }
+
+tasks.withType<ProcessResources> {
+	dependsOn(":frontend:yarn_build")
+	from("frontend/build/") {
+		into("static")
+	}
+}
