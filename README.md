@@ -24,7 +24,9 @@ Create a Spring Boot app using start.spring.io:
 ```
 mkdir myapp
 cd myapp
-curl https://start.spring.io/starter.zip -d type=gradle-project -d language=kotlin -d platformVersion=2.4.0.RELEASE -d groupId=no.dossier -d artifactId=myapp -d dependencies=web -d javaVersion=1.8 -o starter.zip
+curl https://start.spring.io/starter.zip -d type=gradle-project -d language=kotlin \
+  -d platformVersion=2.4.0.RELEASE -d groupId=no.dossier -d artifactId=myapp \
+  -d dependencies=web,devtools -d javaVersion=1.8 -o starter.zip
 unzip starter.zip
 rm starter.zip
 echo "Hello world" >src/main/resources/static/index.html
@@ -33,7 +35,11 @@ git add .
 git commit -m "Initial commit"
 ```
 
-You could also create another kind of app from the list at https://devcenter.heroku.com/start
+Reminder: `gradle tasks` will show you available tasks, e.g. `gradle bootRun`
+which will build and run the application.
+
+You could also create another kind of app from the list at
+https://devcenter.heroku.com/start
 
 ### 2. Deploy with heroku
 
@@ -61,12 +67,12 @@ Add a `frontend/build.gradle.kts`:
 
 ```
 plugins {
-	id("com.github.node-gradle.node") version "2.2.4"
+    id("com.github.node-gradle.node") version "2.2.4"
 }
 
 node {
-	download = true
-	version = "12.19.1"
+    download = true
+    version = "12.19.1"
 }
 
 tasks.getByName("yarn_build").dependsOn("yarn_install")
@@ -76,10 +82,10 @@ Add this to the root `build.gradle.kts`:
 
 ```
 tasks.withType<ProcessResources> {
-	dependsOn(":frontend:yarn_build")
-	from("frontend/build/") {
-		into("static")
-	}
+    dependsOn(":frontend:yarn_build")
+    from("frontend/build/") {
+        into("static")
+    }
 }
 ```
 
@@ -102,4 +108,29 @@ git add .
 git commit -m "Add frontend"
 git push heroku master
 heroku open
+```
+
+The following steps have not been applied to the repo:
+
+### 4. Add a database
+
+Add a database to your heroku app:
+
+```
+heroku addons:create heroku-postgresql:hobby-dev
+```
+
+Add these to the `dependencies`-block of `build.gradle.kts`:
+
+```
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql")
+    implementation("org.flywaydb:flyway-core")
+```
+
+Add a migration for the initial tables you want:
+
+```
+mkdir -p src/main/resources/db/migration
+touch src/main/resources/db/migration/V001__create_table_nodes.sql
 ```
