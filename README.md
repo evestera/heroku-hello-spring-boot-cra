@@ -134,3 +134,35 @@ Add a migration for the initial tables you want:
 mkdir -p src/main/resources/db/migration
 touch src/main/resources/db/migration/V001__create_table_nodes.sql
 ```
+
+You may want to set up a local database to test with, e.g.
+
+```
+psql postgres -c "create user myapp with password 'myapp';"
+createdb --owner=myapp myapp
+```
+
+To use this database locally you can provide the details as environment variables, e.g.
+
+```
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/myapp \
+SPRING_DATASOURCE_USERNAME=myapp \
+SPRING_DATASOURCE_PASSWORD=myapp \
+gradle bootRun
+```
+
+...or use spring profiles and use an environment variable to activate the profile, e.g.
+
+`src/main/resources/application-local.properties`:
+
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/myapp
+spring.datasource.username=myapp
+spring.datasource.password=myapp
+```
+
+```
+SPRING_PROFILES_ACTIVE=local gradle bootRun
+```
+
+(IDEA run configuration for Spring Boot also has an "Active profiles" field)
