@@ -78,6 +78,25 @@ node {
 tasks.getByName("yarn_build").dependsOn("yarn_install")
 ```
 
+<details>
+<summary>Expand for further notes on `frontend/build.gradle.kts`</summary>
+
+To allow Gradle to cache the frontend build we need to tell it about the
+inputs and outputs, i.e. use this instead of the last line:
+
+```
+tasks.getByName("yarn_build") {
+    dependsOn("yarn_install")
+    inputs.dir("src")
+    inputs.files("package.json", "yarn.lock")
+    outputs.dir("build")
+    outputs.cacheIf { true }
+}
+```
+
+This is not necessary as such, but it will make some builds faster.
+</details>
+
 Add this to the root `build.gradle.kts`:
 
 ```
